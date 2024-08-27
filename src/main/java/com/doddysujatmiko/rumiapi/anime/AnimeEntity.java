@@ -24,7 +24,7 @@ public class AnimeEntity extends BaseEntity {
 
     private String japaneseTitle;
 
-    private double rating;
+    private float rating;
 
     @Column(length = 2048)
     private String description;

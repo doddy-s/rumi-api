@@ -19,8 +19,16 @@ public class AnimeController {
     @Autowired
     JikanService jikanService;
 
+    @Autowired
+    AnimeService animeService;
+
     @GetMapping("season/current")
-    public ResponseEntity<?> getCurrentSeasonAnimes(@RequestParam int page) {
-        return responser.response(HttpStatus.OK, "Success", jikanService.readCurrentSeasonAnimes(page));
+    public ResponseEntity<?> getCurrentSeasonAnimes(
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "false") boolean eager) {
+        if(eager)
+            return responser.response(HttpStatus.OK, "Success", jikanService.readCurrentSeasonAnimes(page));
+        else
+            return responser.response(HttpStatus.OK, "Success", animeService.readAnimes());
     }
 }

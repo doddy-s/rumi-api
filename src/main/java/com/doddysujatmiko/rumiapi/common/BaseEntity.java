@@ -1,5 +1,6 @@
 package com.doddysujatmiko.rumiapi.common;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,8 +19,11 @@ public class BaseEntity {
 
     @Column(nullable = false, updatable = false)
     @CreationTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
 
     @UpdateTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonIgnore
     private Date updatedDate;
 }

@@ -6,6 +6,8 @@ import com.doddysujatmiko.rumiapi.common.SimplePage;
 import com.doddysujatmiko.rumiapi.exceptions.InternalServerErrorException;
 import com.doddysujatmiko.rumiapi.log.LogService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -13,7 +15,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class JikanService {
@@ -33,40 +34,38 @@ public class JikanService {
     JikanMapper jikanMapper;
 
     public Object readCurrentSeasonAnimes(int page) {
-        Map<String, Object> resultJson;
-        Object data;
-        Map<String, Object> pagination;
         List<AnimeEntity> animeEntities = new ArrayList<>();
+        JSONObject pagination;
 
         try {
             var restTemplate = new RestTemplate();
-            String result = restTemplate.getForObject(jikanApi + "/seasons/now?page=" + page + 1, String.class);
-            resultJson = objectMapper.readValue(result, Map.class);
-            data = resultJson.get("data");
-            pagination = (Map<String, Object>) resultJson.get("pagination");
-            if(data == null) throw new NullPointerException("Something happens and server can't get the data");
+            String response = restTemplate.getForObject(jikanApi + "/seasons/now?page=" + (page + 1), String.class);
+
+            JSONObject responseJson = new JSONObject(response);
+
+            JSONArray animes = responseJson.getJSONArray("data");
+            if(animes == null) throw new NullPointerException("Something happens and server can't get the data");
+
+            pagination = responseJson.getJSONObject("pagination");
+
+            for(int i = 0; i < animes.length(); i++) {
+                AnimeEntity animeEntity;
+                int malId = animes.getJSONObject(i).getInt("mal_id");
+
+                animeEntity = animeRepository.findByMalId(malId);
+                if(animeEntity == null)
+                    animeEntity = animeRepository.save(jikanMapper.toAnimeEntity(animes.getJSONObject(i)));
+
+                animeEntities.add(animeEntity);
+            }
         } catch (Throwable t) {
             throw new InternalServerErrorException(t.getMessage());
         }
 
-        if (data instanceof List<?>) {
-            List<Map<String, Object>> animes = (List<Map<String, Object>>) data;
-
-            for (var anime : animes) {
-                AnimeEntity animeEntity;
-                if(animeRepository.existsByMalId((int) anime.get("mal_id"))) {
-                    animeEntity = animeRepository.findByMalId((int) anime.get("mal_id"));
-                } else {
-                    animeEntity = animeRepository.save(jikanMapper.toAnimeEntity(anime));
-                }
-                animeEntities.add(animeEntity);
-            }
-        }
-
         var res = new SimplePage();
-        res.setMaxPage(pagination.get("last_visible_page") == null ? -1 : (int) pagination.get("last_visible_page") - 1);
-        res.setCurrentPage(pagination.get("current_page") == null ? -1 : (int) pagination.get("current_page") - 1);
-        res.setHasNextPage(pagination.get("has_next_page") == null || (boolean) pagination.get("has_next_page"));
+        res.setMaxPage(pagination.optInt("last_visible_page", 0) - 1);
+        res.setCurrentPage(pagination.optInt("current_page", 0) - 1);
+        res.setHasNextPage(pagination.optBoolean("has_next_page", false));
         res.setList(animeEntities);
 
         return res;
