@@ -54,4 +54,16 @@ public class AnimeController {
             @PathVariable Integer malId) {
         return responser.response(HttpStatus.OK, "Success", animeService.readAnimesByStudio(malId));
     }
+
+    @GetMapping("/search/{query}/{page}")
+    public ResponseEntity<?> getWithQuery(
+            @PathVariable String query,
+            @PathVariable Integer page) {
+        return responser.response(HttpStatus.OK, "Success", animeService.searchAnime(query, page));
+    }
+
+    @GetMapping("/top")
+    public ResponseEntity<?> getWithQuery() {
+        return responser.response(HttpStatus.OK, "Success", animeService.readTopAnime());
+    }
 }

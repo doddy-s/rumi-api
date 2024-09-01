@@ -127,4 +127,37 @@ public class JikanService {
 
         return res;
     }
+
+    public SimplePage searchAnime(String query, Integer page) {
+        SimplePage simplePage;
+
+        try {
+            var restTemplate = new RestTemplate();
+            String response = restTemplate.getForObject(jikanApi +
+                    "/anime?page=" + (page + 1) +
+                    "&q=" + query, String.class);
+
+            simplePage = jikanMapper.toSimplePage(response);
+        } catch (Throwable t) {
+            throw new InternalServerErrorException(t.getMessage());
+        }
+
+        return simplePage;
+    }
+
+    public SimplePage readTopAnime() {
+        SimplePage simplePage;
+
+        try {
+            var restTemplate = new RestTemplate();
+            String response = restTemplate.getForObject(jikanApi +
+                    "/top/anime?filter=airing&type=tv", String.class);
+
+            simplePage = jikanMapper.toSimplePage(response);
+        } catch (Throwable t) {
+            throw new InternalServerErrorException(t.getMessage());
+        }
+
+        return simplePage;
+    }
 }

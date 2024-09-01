@@ -5,6 +5,7 @@ import com.doddysujatmiko.rumiapi.anime.dtos.GenreDto;
 import com.doddysujatmiko.rumiapi.anime.dtos.StudioDto;
 import com.doddysujatmiko.rumiapi.common.SimplePage;
 import com.doddysujatmiko.rumiapi.exceptions.NotFoundException;
+import com.doddysujatmiko.rumiapi.jikan.JikanService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,12 +15,14 @@ public class AnimeService {
     private final AnimeRepository animeRepository;
     private final GenreRepository genreRepository;
     private final StudioRepository studioRepository;
+    private final JikanService jikanService;
 
     @Autowired
-    public AnimeService(AnimeRepository animeRepository, GenreRepository genreRepository, StudioRepository studioRepository) {
+    public AnimeService(AnimeRepository animeRepository, GenreRepository genreRepository, StudioRepository studioRepository, JikanService jikanService) {
         this.animeRepository = animeRepository;
         this.genreRepository = genreRepository;
         this.studioRepository = studioRepository;
+        this.jikanService = jikanService;
     }
 
     public Object readAnimes() {
@@ -30,6 +33,14 @@ public class AnimeService {
         res.setList(animeRepository.findAll().stream().map(AnimeDto::fromEntity).toList());
 
         return res;
+    }
+
+    public Object searchAnime(String query, Integer page) {
+        return jikanService.searchAnime(query, page);
+    }
+
+    public Object readTopAnime() {
+        return jikanService.readTopAnime();
     }
 
     public Object readGenres() {

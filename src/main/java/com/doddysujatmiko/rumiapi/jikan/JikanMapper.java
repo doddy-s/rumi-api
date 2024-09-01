@@ -1,8 +1,11 @@
 package com.doddysujatmiko.rumiapi.jikan;
 
 import com.doddysujatmiko.rumiapi.anime.*;
+import com.doddysujatmiko.rumiapi.anime.dtos.AnimeDto;
 import com.doddysujatmiko.rumiapi.anime.enums.SeasonEnum;
+import com.doddysujatmiko.rumiapi.common.SimplePage;
 import com.doddysujatmiko.rumiapi.log.LogService;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,12 +18,14 @@ public class JikanMapper {
     private final GenreRepository genreRepository;
     private final StudioRepository studioRepository;
     private final LogService logService;
+    private final AnimeRepository animeRepository;
 
     @Autowired
-    public JikanMapper(GenreRepository genreRepository, StudioRepository studioRepository, LogService logService) {
+    public JikanMapper(GenreRepository genreRepository, StudioRepository studioRepository, LogService logService, AnimeRepository animeRepository) {
         this.genreRepository = genreRepository;
         this.studioRepository = studioRepository;
         this.logService = logService;
+        this.animeRepository = animeRepository;
     }
 
     public AnimeEntity toAnimeEntity(JSONObject anime) {
@@ -74,5 +79,35 @@ public class JikanMapper {
                 .malId(genre.optInt("mal_id", 0))
                 .name(genre.optString("name"))
                 .build();
+    }
+
+    public SimplePage toSimplePage(String response) {
+        List<AnimeEntity> animeEntities = new ArrayList<>();
+
+        JSONObject responseJson = new JSONObject(response);
+
+        JSONArray animes = responseJson.getJSONArray("data");
+        if(animes == null) throw new NullPointerException("Something happens and server can't get the data");
+
+        JSONObject pagination = responseJson.getJSONObject("pagination");
+
+        for(int i = 0; i < animes.length(); i++) {
+            AnimeEntity animeEntity;
+            int malId = animes.getJSONObject(i).getInt("mal_id");
+
+            animeEntity = animeRepository.findByMalId(malId);
+            if(animeEntity == null)
+                animeEntity = animeRepository.save(this.toAnimeEntity(animes.getJSONObject(i)));
+
+            animeEntities.add(animeEntity);
+        }
+
+        var simplePage = new SimplePage();
+        simplePage.setMaxPage(pagination.optInt("last_visible_page", 0) - 1);
+        simplePage.setCurrentPage(pagination.optInt("current_page", 0) - 1);
+        simplePage.setHasNextPage(pagination.optBoolean("has_next_page", false));
+        simplePage.setList(animeEntities.stream().map(AnimeDto::fromEntity).toList());
+
+        return simplePage;
     }
 }
