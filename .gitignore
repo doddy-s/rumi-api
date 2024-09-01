@@ -34,5 +34,6 @@ build/
 
 #custom
 data
+src/main/resources/application.properties
 src/main/resources/application.properties.local
 src/main/resources/application.properties.remote
