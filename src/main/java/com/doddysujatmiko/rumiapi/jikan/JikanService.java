@@ -2,6 +2,8 @@ package com.doddysujatmiko.rumiapi.jikan;
 
 import com.doddysujatmiko.rumiapi.anime.AnimeEntity;
 import com.doddysujatmiko.rumiapi.anime.AnimeRepository;
+import com.doddysujatmiko.rumiapi.anime.GenreEntity;
+import com.doddysujatmiko.rumiapi.anime.dtos.AnimeDto;
 import com.doddysujatmiko.rumiapi.common.SimplePage;
 import com.doddysujatmiko.rumiapi.exceptions.InternalServerErrorException;
 import com.doddysujatmiko.rumiapi.log.LogService;
@@ -66,8 +68,29 @@ public class JikanService {
         res.setMaxPage(pagination.optInt("last_visible_page", 0) - 1);
         res.setCurrentPage(pagination.optInt("current_page", 0) - 1);
         res.setHasNextPage(pagination.optBoolean("has_next_page", false));
-        res.setList(animeEntities);
+        res.setList(animeEntities.stream().map(AnimeDto::fromEntity).toList());
 
         return res;
+    }
+
+    public List<GenreEntity> readAllGenres() {
+        List<GenreEntity> genreEntities = new ArrayList<>();
+
+        try {
+            var restTemplate = new RestTemplate();
+            String response = restTemplate.getForObject(jikanApi + "/genres/anime", String.class);
+
+            JSONObject responseJson = new JSONObject(response);
+
+            JSONArray genres = responseJson.getJSONArray("data");
+            if(genres == null) throw new NullPointerException("Something happens and server can't get the data");
+
+            for(int i = 0; i < genres.length(); i++)
+                genreEntities.add(jikanMapper.toGenreEntity(genres.getJSONObject(i)));
+        } catch (Throwable t) {
+            throw new InternalServerErrorException(t.getMessage());
+        }
+
+        return genreEntities;
     }
 }

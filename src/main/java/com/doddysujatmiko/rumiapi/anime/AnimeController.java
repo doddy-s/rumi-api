@@ -2,25 +2,26 @@ package com.doddysujatmiko.rumiapi.anime;
 
 import com.doddysujatmiko.rumiapi.common.utils.Responser;
 import com.doddysujatmiko.rumiapi.jikan.JikanService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/anime")
+@Tag(name = "Anime")
 public class AnimeController {
-    @Autowired
-    Responser responser;
+    private final Responser responser;
+    private final JikanService jikanService;
+    private final AnimeService animeService;
 
     @Autowired
-    JikanService jikanService;
-
-    @Autowired
-    AnimeService animeService;
+    public AnimeController(Responser responser, JikanService jikanService, AnimeService animeService) {
+        this.responser = responser;
+        this.jikanService = jikanService;
+        this.animeService = animeService;
+    }
 
     @GetMapping("season/current")
     public ResponseEntity<?> getCurrentSeasonAnimes(
@@ -30,5 +31,27 @@ public class AnimeController {
             return responser.response(HttpStatus.OK, "Success", jikanService.readCurrentSeasonAnimes(page));
         else
             return responser.response(HttpStatus.OK, "Success", animeService.readAnimes());
+    }
+
+    @GetMapping("/genre")
+    public ResponseEntity<?> getGenres() {
+        return responser.response(HttpStatus.OK, "Success", animeService.readGenres());
+    }
+
+    @GetMapping("/genre/{malId}")
+    public ResponseEntity<?> getByGenre(
+            @PathVariable(required = true) Integer malId) {
+        return responser.response(HttpStatus.OK, "Success", animeService.readAnimesByGenre(malId));
+    }
+
+    @GetMapping("/studio")
+    public ResponseEntity<?> getStudios() {
+        return responser.response(HttpStatus.OK, "Success", animeService.readStudios());
+    }
+
+    @GetMapping("/studio/{malId}")
+    public ResponseEntity<?> getByStudio(
+            @PathVariable(required = true) Integer malId) {
+        return responser.response(HttpStatus.OK, "Success", animeService.readAnimesByStudio(malId));
     }
 }
