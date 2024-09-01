@@ -30,42 +30,19 @@ public class JikanService {
     @Value("${jikan.api.root}")
     String jikanApi;
 
-    public Object readCurrentSeasonAnimes(int page) {
-        List<AnimeEntity> animeEntities = new ArrayList<>();
-        JSONObject pagination;
+    public SimplePage readCurrentSeasonAnimes(int page) {
+        SimplePage simplePage;
 
         try {
             var restTemplate = new RestTemplate();
             String response = restTemplate.getForObject(jikanApi + "/seasons/now?page=" + (page + 1), String.class);
 
-            JSONObject responseJson = new JSONObject(response);
-
-            JSONArray animes = responseJson.getJSONArray("data");
-            if(animes == null) throw new NullPointerException("Something happens and server can't get the data");
-
-            pagination = responseJson.getJSONObject("pagination");
-
-            for(int i = 0; i < animes.length(); i++) {
-                AnimeEntity animeEntity;
-                int malId = animes.getJSONObject(i).getInt("mal_id");
-
-                animeEntity = animeRepository.findByMalId(malId);
-                if(animeEntity == null)
-                    animeEntity = animeRepository.save(jikanMapper.toAnimeEntity(animes.getJSONObject(i)));
-
-                animeEntities.add(animeEntity);
-            }
+            simplePage = jikanMapper.toSimplePage(response);
         } catch (Throwable t) {
             throw new InternalServerErrorException(t.getMessage());
         }
 
-        var res = new SimplePage();
-        res.setMaxPage(pagination.optInt("last_visible_page", 0) - 1);
-        res.setCurrentPage(pagination.optInt("current_page", 0) - 1);
-        res.setHasNextPage(pagination.optBoolean("has_next_page", false));
-        res.setList(animeEntities.stream().map(AnimeDto::fromEntity).toList());
-
-        return res;
+        return simplePage;
     }
 
     public List<GenreEntity> readAllGenres() {
@@ -90,42 +67,18 @@ public class JikanService {
     }
 
     public SimplePage readAllAnimes(Integer page) {
-        List<AnimeEntity> animeEntities = new ArrayList<>();
-        JSONObject pagination;
+        SimplePage simplePage;
 
         try {
             var restTemplate = new RestTemplate();
             String response = restTemplate.getForObject(jikanApi + "/anime?page=" + (page + 1), String.class);
 
-            JSONObject responseJson = new JSONObject(response);
-
-            JSONArray animes = responseJson.getJSONArray("data");
-            if(animes == null) throw new NullPointerException("Something happens and server can't get the data");
-
-            pagination = responseJson.getJSONObject("pagination");
-
-            for(int i = 0; i < animes.length(); i++) {
-                AnimeEntity animeEntity;
-                int malId = animes.getJSONObject(i).getInt("mal_id");
-
-                animeEntity = animeRepository.findByMalId(malId);
-                if(animeEntity == null)
-                    animeEntity = animeRepository.save(jikanMapper.toAnimeEntity(animes.getJSONObject(i)));
-
-                animeEntities.add(animeEntity);
-            }
+            simplePage = jikanMapper.toSimplePage(response);
         } catch (Throwable t) {
             throw new InternalServerErrorException(t.getMessage());
-
         }
 
-        var res = new SimplePage();
-        res.setMaxPage(pagination.optInt("last_visible_page", 0) - 1);
-        res.setCurrentPage(pagination.optInt("current_page", 0) - 1);
-        res.setHasNextPage(pagination.optBoolean("has_next_page", false));
-        res.setList(animeEntities.stream().map(AnimeDto::fromEntity).toList());
-
-        return res;
+        return simplePage;
     }
 
     public SimplePage searchAnime(String query, Integer page) {
