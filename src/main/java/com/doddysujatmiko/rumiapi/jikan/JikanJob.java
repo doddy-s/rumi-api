@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 
 @Component
-@EnableScheduling
+//@EnableScheduling
 public class JikanJob {
     private final LogService logService;
     private final CommonRepository commonRepository;
