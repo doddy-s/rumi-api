@@ -5,6 +5,7 @@ import com.doddysujatmiko.rumiapi.anime.dtos.AnimeDto;
 import com.doddysujatmiko.rumiapi.anime.enums.SeasonEnum;
 import com.doddysujatmiko.rumiapi.common.SimplePage;
 import com.doddysujatmiko.rumiapi.log.LogService;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +63,7 @@ public class JikanMapper {
                 .englishTitle(anime.optString("title_english", null))
                 .japaneseTitle(anime.optString("title_japanese", null))
                 .score(anime.has("score") ? anime.optFloat("score") : 0f)
-                .synopsis(anime.optString("synopsis", null))
+                .synopsis(StringUtils.abbreviate(anime.optString("synopsis", null), 2048))
                 .image(anime.optJSONObject("images")
                         .optJSONObject("jpg")
                         .optString("image_url", null))
