@@ -20,20 +20,17 @@ import java.util.List;
 
 @Service
 public class JikanService {
+    private final JikanMapper jikanMapper;
+    private final AnimeRepository animeRepository;
+
     @Autowired
-    LogService logService;
+    public JikanService(AnimeRepository animeRepository, JikanMapper jikanMapper) {
+        this.animeRepository = animeRepository;
+        this.jikanMapper = jikanMapper;
+    }
 
     @Value("${jikan.api.root}")
     String jikanApi;
-
-    @Autowired
-    ObjectMapper objectMapper;
-
-    @Autowired
-    AnimeRepository animeRepository;
-
-    @Autowired
-    JikanMapper jikanMapper;
 
     public Object readCurrentSeasonAnimes(int page) {
         List<AnimeEntity> animeEntities = new ArrayList<>();
@@ -92,5 +89,44 @@ public class JikanService {
         }
 
         return genreEntities;
+    }
+
+    public SimplePage readAllAnimes(Integer page) {
+        List<AnimeEntity> animeEntities = new ArrayList<>();
+        JSONObject pagination;
+
+        try {
+            var restTemplate = new RestTemplate();
+            String response = restTemplate.getForObject(jikanApi + "/anime?page=" + (page + 1), String.class);
+
+            JSONObject responseJson = new JSONObject(response);
+
+            JSONArray animes = responseJson.getJSONArray("data");
+            if(animes == null) throw new NullPointerException("Something happens and server can't get the data");
+
+            pagination = responseJson.getJSONObject("pagination");
+
+            for(int i = 0; i < animes.length(); i++) {
+                AnimeEntity animeEntity;
+                int malId = animes.getJSONObject(i).getInt("mal_id");
+
+                animeEntity = animeRepository.findByMalId(malId);
+                if(animeEntity == null)
+                    animeEntity = animeRepository.save(jikanMapper.toAnimeEntity(animes.getJSONObject(i)));
+
+                animeEntities.add(animeEntity);
+            }
+        } catch (Throwable t) {
+            throw new InternalServerErrorException(t.getMessage());
+
+        }
+
+        var res = new SimplePage();
+        res.setMaxPage(pagination.optInt("last_visible_page", 0) - 1);
+        res.setCurrentPage(pagination.optInt("current_page", 0) - 1);
+        res.setHasNextPage(pagination.optBoolean("has_next_page", false));
+        res.setList(animeEntities.stream().map(AnimeDto::fromEntity).toList());
+
+        return res;
     }
 }
