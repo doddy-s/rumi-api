@@ -1,7 +1,6 @@
 package com.doddysujatmiko.rumiapi.anime;
 
 import com.doddysujatmiko.rumiapi.anime.enums.SeasonEnum;
-import com.doddysujatmiko.rumiapi.auth.RoleEntity;
 import com.doddysujatmiko.rumiapi.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;

@@ -23,7 +23,7 @@ public class JikanJob {
         this.jikanService = jikanService;
     }
 
-    @Scheduled(cron = "*/20 * * * * *")
+    @Scheduled(cron = "${jikan.anime.scrape.rate.cronjob}")
     public void scrapeJikanAnimes() {
         var currentPage = commonRepository.findByKey("JikanScrapeCurrentPage");
         var maxPage = commonRepository.findByKey("JikanScrapeMaxPage");

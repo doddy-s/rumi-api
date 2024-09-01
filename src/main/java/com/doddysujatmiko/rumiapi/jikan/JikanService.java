@@ -6,8 +6,6 @@ import com.doddysujatmiko.rumiapi.anime.GenreEntity;
 import com.doddysujatmiko.rumiapi.anime.dtos.AnimeDto;
 import com.doddysujatmiko.rumiapi.common.SimplePage;
 import com.doddysujatmiko.rumiapi.exceptions.InternalServerErrorException;
-import com.doddysujatmiko.rumiapi.log.LogService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;

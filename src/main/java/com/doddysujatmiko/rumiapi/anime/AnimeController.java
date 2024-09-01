@@ -40,7 +40,7 @@ public class AnimeController {
 
     @GetMapping("/genre/{malId}")
     public ResponseEntity<?> getByGenre(
-            @PathVariable(required = true) Integer malId) {
+            @PathVariable Integer malId) {
         return responser.response(HttpStatus.OK, "Success", animeService.readAnimesByGenre(malId));
     }
 
@@ -51,7 +51,7 @@ public class AnimeController {
 
     @GetMapping("/studio/{malId}")
     public ResponseEntity<?> getByStudio(
-            @PathVariable(required = true) Integer malId) {
+            @PathVariable Integer malId) {
         return responser.response(HttpStatus.OK, "Success", animeService.readAnimesByStudio(malId));
     }
 }

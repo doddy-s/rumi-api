@@ -25,10 +25,16 @@ public class JikanMapper {
 
     public AnimeEntity toAnimeEntity(JSONObject anime) {
         List<GenreEntity> genreEntities = new ArrayList<>();
-        for(var genre : anime.getJSONArray("genres"))
-            genreEntities.add(genreRepository.findByMalId(((JSONObject) genre).optInt("mal_id", 0)));
-        for(var genre : anime.getJSONArray("themes"))
-            genreEntities.add(genreRepository.findByMalId(((JSONObject) genre).optInt("mal_id", 0)));
+        for(var genre : anime.getJSONArray("genres")) {
+            GenreEntity genreEntity = genreRepository.findByMalId(((JSONObject) genre).optInt("mal_id", 0));
+            if(genreEntity == null) continue;
+            genreEntities.add(genreEntity);
+        }
+        for(var genre : anime.getJSONArray("themes")) {
+            GenreEntity genreEntity = genreRepository.findByMalId(((JSONObject) genre).optInt("mal_id", 0));
+            if(genreEntity == null) continue;
+            genreEntities.add(genreEntity);
+        }
 
 
         List<StudioEntity> studioEntities = new ArrayList<>();
