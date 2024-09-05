@@ -15,8 +15,8 @@ import org.springframework.context.annotation.Configuration;
         servers = {
                 @Server(description = "development host",
                         url = "http://localhost:8080"),
-                @Server(description = "test host",
-                        url = "http://35.240.243.130:8080"),
+                @Server(description = "production host",
+                        url = "${RUMI_API_HOST}"),
         }
 )
 @SecurityScheme(

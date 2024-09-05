@@ -8,6 +8,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db/rumi-db
       SPRING_DATASOURCE_USERNAME: rumi-user
       SPRING_DATASOURCE_PASSWORD: rumirumi
+      RUMI_API_HOST: https://rumiapi.cekrek.shop
   db:
     image: postgres
     container_name: postgres-container
@@ -23,7 +24,7 @@ services:
     container_name: pgadmin-container
     restart: always
     ports:
-      - "80:80"
+      - "5433:80"
     environment:
       PGADMIN_DEFAULT_EMAIL: pgadmin@local.com
       PGADMIN_DEFAULT_PASSWORD: root

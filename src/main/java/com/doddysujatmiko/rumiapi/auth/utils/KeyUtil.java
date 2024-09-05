@@ -21,9 +21,6 @@ import java.util.Objects;
 @Component
 @Slf4j
 public class KeyUtil {
-    @Value("${environment}")
-    String environment;
-
     @Value("${access-token.private}")
     private String accessTokenPrivateKeyPath;
 
@@ -85,10 +82,6 @@ public class KeyUtil {
                 return keyPair;
             } catch (NoSuchAlgorithmException | IOException | InvalidKeySpecException e) {
                 throw new RuntimeException(e);
-            }
-        } else {
-            if (Objects.equals(environment, "production")) {
-                throw new RuntimeException("public and private keys don't exist");
             }
         }
 
