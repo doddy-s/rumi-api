@@ -3,12 +3,16 @@ package com.doddysujatmiko.rumiapi.anime;
 import com.doddysujatmiko.rumiapi.anime.dtos.AnimeDto;
 import com.doddysujatmiko.rumiapi.anime.dtos.GenreDto;
 import com.doddysujatmiko.rumiapi.anime.dtos.StudioDto;
+import com.doddysujatmiko.rumiapi.anime.enums.SeasonEnum;
 import com.doddysujatmiko.rumiapi.common.SimplePage;
 import com.doddysujatmiko.rumiapi.exceptions.NotFoundException;
 import com.doddysujatmiko.rumiapi.jikan.JikanService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
 
 @Service
 public class AnimeService {
@@ -25,14 +29,24 @@ public class AnimeService {
         this.jikanService = jikanService;
     }
 
-    public Object readAnimes() {
-        var res = new SimplePage();
-        res.setMaxPage(0);
-        res.setCurrentPage(0);
-        res.setHasNextPage(false);
-        res.setList(animeRepository.findAll().stream().map(AnimeDto::fromEntity).toList());
+    public Object readCurrentSeasonAnimes(Integer page) {
+        var month = LocalDate.now().getMonthValue();
+        SeasonEnum currentSeason = switch (month) {
+            case 1, 2, 3 -> SeasonEnum.WINTER;
+            case 4, 5, 6 -> SeasonEnum.SPRING;
+            case 7, 8, 9 -> SeasonEnum.SUMMER;
+            case 10, 11, 12 -> SeasonEnum.FALL;
+            default -> throw new IllegalStateException("Unexpected value: " + month);
+        };
 
-        return res;
+        var animePage = animeRepository.findByYearAndSeason(LocalDate.now().getYear(),
+                currentSeason,
+                PageRequest.of(page, 25));
+
+        var sp = SimplePage.<AnimeDto>fromPageWithEmptyList(animePage);
+        sp.setList(animePage.getContent().stream().map(AnimeDto::fromEntity).toList());
+
+        return sp;
     }
 
     public Object searchAnime(String query, Integer page) {

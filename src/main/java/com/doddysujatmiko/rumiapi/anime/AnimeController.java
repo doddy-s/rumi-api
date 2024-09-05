@@ -13,24 +13,17 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Anime")
 public class AnimeController {
     private final Responser responser;
-    private final JikanService jikanService;
     private final AnimeService animeService;
 
     @Autowired
-    public AnimeController(Responser responser, JikanService jikanService, AnimeService animeService) {
+    public AnimeController(Responser responser, AnimeService animeService) {
         this.responser = responser;
-        this.jikanService = jikanService;
         this.animeService = animeService;
     }
 
     @GetMapping("season/current")
-    public ResponseEntity<?> getCurrentSeasonAnimes(
-            @RequestParam(required = false, defaultValue = "0") int page,
-            @RequestParam(required = false, defaultValue = "false") boolean eager) {
-        if(eager)
-            return responser.response(HttpStatus.OK, "Success", jikanService.readCurrentSeasonAnimes(page));
-        else
-            return responser.response(HttpStatus.OK, "Success", animeService.readAnimes());
+    public ResponseEntity<?> getCurrentSeasonAnimes(@RequestParam(required = false, defaultValue = "0") Integer page) {
+            return responser.response(HttpStatus.OK, "Success", animeService.readCurrentSeasonAnimes(page));
     }
 
     @GetMapping("/genre")
@@ -50,8 +43,7 @@ public class AnimeController {
     }
 
     @GetMapping("/studio/{malId}")
-    public ResponseEntity<?> getByStudio(
-            @PathVariable Integer malId) {
+    public ResponseEntity<?> getByStudio(@PathVariable Integer malId) {
         return responser.response(HttpStatus.OK, "Success", animeService.readAnimesByStudio(malId));
     }
 
@@ -63,7 +55,7 @@ public class AnimeController {
     }
 
     @GetMapping("/top")
-    public ResponseEntity<?> getWithQuery() {
+    public ResponseEntity<?> getTopAnime() {
         return responser.response(HttpStatus.OK, "Success", animeService.readTopAnime());
     }
 
