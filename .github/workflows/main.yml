@@ -3,7 +3,7 @@ name: Deploy
 on:
   push:
     branches:
-      - production
+      - main
 
 jobs:
   deploy:
@@ -20,7 +20,7 @@ jobs:
           script: |
             mkdir production
             cd production
-            git clone -b production --single-branch ${{ secrets.REPO_URL }}
+            git clone ${{ secrets.REPO_URL }}
             cd ${{ secrets.REPO_NAME }}
             git pull
             docker compose stop
