@@ -103,7 +103,8 @@ public class AnimeService {
         if(animeEntity == null) animeEntity = jikanService.readOne(malId);
         if(animeEntity == null) throw new NotFoundException("Anime not found");
         if(!(animeEntity.getConsumets() == null))
-            return animeEntity.getConsumets().stream().map(ConsumetDto::fromEntity).toList();
+            if(!animeEntity.getConsumets().isEmpty())
+                return animeEntity.getConsumets().stream().map(ConsumetDto::fromEntity).toList();
 
         var consumets = consumetService.readRelatedStreams(animeEntity.getTitle());
 
