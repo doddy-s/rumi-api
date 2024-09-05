@@ -16,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "consumets")
-public class ConsumetEntity extends BaseEntity {
+public class ConsumetAnimeEntity extends BaseEntity {
     private Integer malId;
 
     private String consumetId;
@@ -31,4 +31,7 @@ public class ConsumetEntity extends BaseEntity {
     @JsonIgnore
     @ManyToMany(targetEntity = AnimeEntity.class, mappedBy = "consumets", fetch = FetchType.LAZY)
     private List<AnimeEntity> animes;
+
+    @OneToMany(mappedBy = "consumetAnime", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<ConsumetEpisodeEntity> consumetEpisodes;
 }

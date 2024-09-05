@@ -4,6 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ConsumetRepository extends JpaRepository<ConsumetEntity, Long> {
-    ConsumetEntity findByConsumetId(String consumetId);
+public interface ConsumetAnimeRepository extends JpaRepository<ConsumetAnimeEntity, Long> {
+    ConsumetAnimeEntity findByConsumetId(String consumetId);
 }

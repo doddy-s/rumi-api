@@ -2,7 +2,7 @@ package com.doddysujatmiko.rumiapi.anime;
 
 import com.doddysujatmiko.rumiapi.anime.enums.SeasonEnum;
 import com.doddysujatmiko.rumiapi.common.BaseEntity;
-import com.doddysujatmiko.rumiapi.consumet.ConsumetEntity;
+import com.doddysujatmiko.rumiapi.consumet.ConsumetAnimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -64,7 +64,7 @@ public class AnimeEntity extends BaseEntity {
     )
     private List<StudioEntity> studios = new ArrayList<>();
 
-    @ManyToMany(targetEntity = ConsumetEntity.class,
+    @ManyToMany(targetEntity = ConsumetAnimeEntity.class,
             cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH},
             fetch = FetchType.LAZY)
     @JoinTable(
@@ -76,5 +76,5 @@ public class AnimeEntity extends BaseEntity {
                     @JoinColumn(name = "consumet_id")
             }
     )
-    private List<ConsumetEntity> consumets = new ArrayList<>();
+    private List<ConsumetAnimeEntity> consumets = new ArrayList<>();
 }

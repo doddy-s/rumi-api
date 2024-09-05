@@ -1,6 +1,6 @@
 package com.doddysujatmiko.rumiapi.consumet.dtos;
 
-import com.doddysujatmiko.rumiapi.consumet.ConsumetEntity;
+import com.doddysujatmiko.rumiapi.consumet.ConsumetAnimeEntity;
 import com.doddysujatmiko.rumiapi.consumet.enums.ProviderEnum;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -25,13 +25,13 @@ public class ConsumetDto {
     @Enumerated(EnumType.STRING)
     private ProviderEnum provider;
 
-    public static ConsumetDto fromEntity(ConsumetEntity consumetEntity) {
+    public static ConsumetDto fromEntity(ConsumetAnimeEntity consumetAnimeEntity) {
         return ConsumetDto.builder()
 //                .malId(consumetEntity.getMalId() == 0 ? null : consumetEntity.getMalId())
-                .consumetId(consumetEntity.getConsumetId())
-                .title(consumetEntity.getTitle())
-                .image(consumetEntity.getImage())
-                .provider(consumetEntity.getProvider())
+                .consumetId(consumetAnimeEntity.getConsumetId())
+                .title(consumetAnimeEntity.getTitle())
+                .image(consumetAnimeEntity.getImage())
+                .provider(consumetAnimeEntity.getProvider())
                 .build();
     }
 }

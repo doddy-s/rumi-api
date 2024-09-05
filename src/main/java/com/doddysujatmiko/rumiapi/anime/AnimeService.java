@@ -114,4 +114,8 @@ public class AnimeService {
 
         return consumets.stream().map(ConsumetDto::fromEntity).toList();
     }
+
+    public Object readEpisodes(String consumetId) {
+        return consumetService.readEpisodes(consumetId);
+    }
 }
