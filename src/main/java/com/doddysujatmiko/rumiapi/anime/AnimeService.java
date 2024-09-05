@@ -5,6 +5,8 @@ import com.doddysujatmiko.rumiapi.anime.dtos.GenreDto;
 import com.doddysujatmiko.rumiapi.anime.dtos.StudioDto;
 import com.doddysujatmiko.rumiapi.anime.enums.SeasonEnum;
 import com.doddysujatmiko.rumiapi.common.SimplePage;
+import com.doddysujatmiko.rumiapi.consumet.ConsumetService;
+import com.doddysujatmiko.rumiapi.consumet.dtos.ConsumetDto;
 import com.doddysujatmiko.rumiapi.exceptions.NotFoundException;
 import com.doddysujatmiko.rumiapi.jikan.JikanService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +22,15 @@ public class AnimeService {
     private final GenreRepository genreRepository;
     private final StudioRepository studioRepository;
     private final JikanService jikanService;
+    private final ConsumetService consumetService;
 
     @Autowired
-    public AnimeService(AnimeRepository animeRepository, GenreRepository genreRepository, StudioRepository studioRepository, JikanService jikanService) {
+    public AnimeService(AnimeRepository animeRepository, GenreRepository genreRepository, StudioRepository studioRepository, JikanService jikanService, ConsumetService consumetService) {
         this.animeRepository = animeRepository;
         this.genreRepository = genreRepository;
         this.studioRepository = studioRepository;
         this.jikanService = jikanService;
+        this.consumetService = consumetService;
     }
 
     public Object readCurrentSeasonAnimes(Integer page) {
@@ -83,12 +87,30 @@ public class AnimeService {
         return studioEntity.getAnimes().stream().map(AnimeDto::fromEntity).toList();
     }
 
-    public Object readOne(Integer malId) {
+    public AnimeDto readOne(Integer malId) {
         var animeEntity = animeRepository.findByMalId(malId);
 
         if(animeEntity == null) animeEntity = jikanService.readOne(malId);
         if(animeEntity == null) throw new NotFoundException("Anime not found");
 
         return AnimeDto.fromEntity(animeEntity);
+    }
+
+    @Transactional
+    public Object readRelatedStreams(Integer malId) {
+        var animeEntity = animeRepository.findByMalId(malId);
+
+        if(animeEntity == null) animeEntity = jikanService.readOne(malId);
+        if(animeEntity == null) throw new NotFoundException("Anime not found");
+        if(!(animeEntity.getConsumets() == null))
+            return animeEntity.getConsumets().stream().map(ConsumetDto::fromEntity).toList();
+
+        var consumets = consumetService.readRelatedStreams(animeEntity.getTitle());
+
+        animeEntity.setConsumets(consumets);
+
+        animeRepository.save(animeEntity);
+
+        return consumets.stream().map(ConsumetDto::fromEntity).toList();
     }
 }

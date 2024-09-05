@@ -63,4 +63,9 @@ public class AnimeController {
     public ResponseEntity<?> getByMalId(@PathVariable Integer malId) {
         return responser.response(HttpStatus.OK, "Success", animeService.readOne(malId));
     }
+
+    @GetMapping("/stream/{malId}")
+    public ResponseEntity<?> getStreamByMalId(@PathVariable Integer malId) {
+        return responser.response(HttpStatus.OK, "Success", animeService.readRelatedStreams(malId));
+    }
 }
