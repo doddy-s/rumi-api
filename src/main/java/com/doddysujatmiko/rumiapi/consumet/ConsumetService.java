@@ -24,7 +24,7 @@ public class ConsumetService {
     private final ConsumetRepository consumetRepository;
     private final LogService logService;
 
-    @Value("${consumet.api.root}")
+    @Value("${CONSUMET_API_HOST}")
     String consumetApi;
 
     @Autowired

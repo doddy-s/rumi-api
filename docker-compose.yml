@@ -1,6 +1,7 @@
 services:
   api:
     build: .
+    image: rumi-image
     container_name: rumi-container
     ports:
       - "8080:8080"
@@ -9,6 +10,7 @@ services:
       SPRING_DATASOURCE_USERNAME: rumi-user
       SPRING_DATASOURCE_PASSWORD: rumirumi
       RUMI_API_HOST: https://rumiapi.cekrek.shop
+      CONSUMET_API_HOST: http://consumet
   db:
     image: postgres
     container_name: postgres-container
@@ -30,6 +32,14 @@ services:
       PGADMIN_DEFAULT_PASSWORD: root
     volumes:
       - pgadmin-data:/var/lib/pgadmin
+  consumet:
+    image: riimuru/consumet-api:latest
+    container_name: consumet-container
+    restart: always
+    ports:
+      - "3000:80"
+    environment:
+      PORT: 80
 
 volumes:
   postgres-data:
