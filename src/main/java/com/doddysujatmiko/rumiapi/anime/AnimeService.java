@@ -7,6 +7,8 @@ import com.doddysujatmiko.rumiapi.anime.enums.SeasonEnum;
 import com.doddysujatmiko.rumiapi.common.SimplePage;
 import com.doddysujatmiko.rumiapi.consumet.ConsumetService;
 import com.doddysujatmiko.rumiapi.consumet.dtos.ConsumetDto;
+import com.doddysujatmiko.rumiapi.consumet.enums.ProviderEnum;
+import com.doddysujatmiko.rumiapi.consumet.enums.ServerEnum;
 import com.doddysujatmiko.rumiapi.exceptions.NotFoundException;
 import com.doddysujatmiko.rumiapi.jikan.JikanService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -117,5 +119,9 @@ public class AnimeService {
 
     public Object readEpisodes(String consumetId) {
         return consumetService.readEpisodes(consumetId);
+    }
+
+    public Object readEpisodeServers(String consumetId, ProviderEnum provider, ServerEnum server) {
+        return consumetService.readEpisodeServers(consumetId, provider, server);
     }
 }

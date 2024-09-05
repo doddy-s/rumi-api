@@ -15,7 +15,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "consumets")
+@Table(name = "consumet_animes")
 public class ConsumetAnimeEntity extends BaseEntity {
     private Integer malId;
 
