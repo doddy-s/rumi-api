@@ -1,0 +1,35 @@
+services:
+  api:
+    build: .
+    container_name: rumi-container
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db/rumi-db
+      SPRING_DATASOURCE_USERNAME: rumi-user
+      SPRING_DATASOURCE_PASSWORD: rumirumi
+  db:
+    image: postgres
+    container_name: postgres-container
+    restart: always
+    environment:
+      POSTGRES_USER: rumi-user
+      POSTGRES_PASSWORD: rumirumi
+      POSTGRES_DB: rumi-db
+    volumes:
+      - postgres-data:/var/lib/postgres/data
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin-container
+    restart: always
+    ports:
+      - "80:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pgadmin@local.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+
+volumes:
+  postgres-data:
+  pgadmin-data:
