@@ -1,0 +1,28 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - production
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_PRIVATE_KEY }}
+          port: 22
+          script: |
+            mkdir production
+            cd production
+            git clone -b production --single-branch ${{ secrets.REPO_URL }}
+            cd ${{ secrets.REPO_NAME }}
+            git pull
+            docker compose stop
+            docker compose build --no-cache
+            docker compose up -d
