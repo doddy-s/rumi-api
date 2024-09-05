@@ -68,4 +68,13 @@ public class AnimeService {
 
         return studioEntity.getAnimes().stream().map(AnimeDto::fromEntity).toList();
     }
+
+    public Object readOne(Integer malId) {
+        var animeEntity = animeRepository.findByMalId(malId);
+
+        if(animeEntity == null) animeEntity = jikanService.readOne(malId);
+        if(animeEntity == null) throw new NotFoundException("Anime not found");
+
+        return AnimeDto.fromEntity(animeEntity);
+    }
 }

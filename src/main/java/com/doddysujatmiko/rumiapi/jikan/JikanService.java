@@ -113,4 +113,16 @@ public class JikanService {
 
         return simplePage;
     }
+
+    public AnimeEntity readOne(Integer malId) {
+        try {
+            var restTemplate = new RestTemplate();
+            String response = restTemplate.getForObject(jikanApi +
+                    "/anime/"+malId, String.class);
+
+            return animeRepository.save(jikanMapper.toAnimeEntity(new JSONObject(response).getJSONObject("data")));
+        } catch (Throwable t) {
+            return null;
+        }
+    }
 }
