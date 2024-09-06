@@ -80,7 +80,8 @@ public class ConsumetService {
                 consumetEntities.add(consumet);
             }
         } catch (Throwable t) {
-            throw new InternalServerErrorException(t.getMessage());
+            logService.logError("Error consumet search on provider "+provider+" with message "+t.getMessage());
+            return new ArrayList<>();
         }
 
         return consumetEntities;
