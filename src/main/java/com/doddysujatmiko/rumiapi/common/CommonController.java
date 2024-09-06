@@ -8,9 +8,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/common")
 public class CommonController {
-    @GetMapping()
+    @GetMapping("/hello")
     String getHello() {
         return "Hello";
     }
 
+    @GetMapping("/error")
+    String getError() {
+        throw new Error("You ask for this!!");
+    }
 }

@@ -4,19 +4,28 @@ import com.doddysujatmiko.rumiapi.common.utils.Responser;
 import com.doddysujatmiko.rumiapi.log.LogService;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.domain.AbstractAuditable;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 @RestControllerAdvice
 public class CustomExceptionHandler {
-    @Autowired
-    LogService logService;
+    private final LogService logService;
+    private final Responser responser;
+    private final Environment environment;
 
     @Autowired
-    Responser responser;
+    public CustomExceptionHandler(LogService logService, Responser responser, Environment environment) {
+        this.logService = logService;
+        this.responser = responser;
+        this.environment = environment;
+    }
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<?> handleNotFoundException(Exception exception) {
@@ -54,15 +63,37 @@ public class CustomExceptionHandler {
         return responser.response(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
     }
 
-//    @ExceptionHandler(Exception.class)
-//    public ResponseEntity<?> handleException(Exception exception) {
-//        logService.logError(exception.getMessage());
-//        return responser.response(HttpStatus.INTERNAL_SERVER_ERROR, "[UNHANDLED EXCEPTION] " + exception.getMessage());
-//    }
-//
-//    @ExceptionHandler(Error.class)
-//    public ResponseEntity<?> handleError(Error error) {
-//        logService.logError(error.getMessage());
-//        return responser.response(HttpStatus.INTERNAL_SERVER_ERROR, "[UNHANDLED ERROR] " + error.getMessage());
-//    }
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<?> handleException(Exception exception) {
+        var conciseStackTrace = "StackTrace" + Arrays
+                .stream(exception.getCause().getStackTrace())
+                .limit(3)
+                .map(element -> "," + element.getClassName() +
+                        "/" + element.getMethodName() +
+                        "/" + element.getLineNumber())
+                .collect(Collectors.joining());
+
+        logService.logError(conciseStackTrace);
+        if(Objects.equals(environment.getActiveProfiles()[0], "dev"))
+            return responser.response(HttpStatus.INTERNAL_SERVER_ERROR, "[UNHANDLED EXCEPTION] " + conciseStackTrace);
+
+        return responser.response(HttpStatus.INTERNAL_SERVER_ERROR, "[UNHANDLED EXCEPTION] " + exception.getMessage());
+    }
+
+    @ExceptionHandler(Error.class)
+    public ResponseEntity<?> handleError(Error error) {
+        var conciseStackTrace = "StackTrace" + Arrays
+                .stream(error.getCause().getStackTrace())
+                .limit(3)
+                .map(element -> "," + element.getClassName() +
+                        "/" + element.getMethodName() +
+                        "/" + element.getLineNumber())
+                .collect(Collectors.joining());
+
+        logService.logError(conciseStackTrace);
+        if(Objects.equals(environment.getActiveProfiles()[0], "dev"))
+            return responser.response(HttpStatus.INTERNAL_SERVER_ERROR, "[UNHANDLED ERROR] " + conciseStackTrace);
+
+        return responser.response(HttpStatus.INTERNAL_SERVER_ERROR, "[UNHANDLED ERROR] " + error.getMessage());
+    }
 }
