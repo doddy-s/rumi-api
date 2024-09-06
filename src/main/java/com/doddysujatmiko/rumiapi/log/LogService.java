@@ -8,8 +8,12 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class LogService {
+    private final LogRepository logRepository;
+
     @Autowired
-    LogRepository logRepository;
+    public LogService(LogRepository logRepository) {
+        this.logRepository = logRepository;
+    }
 
     public void logInfo(String message) {
         log.info(message);
@@ -22,12 +26,12 @@ public class LogService {
     }
 
     public void logError(String message) {
-        log.info(message);
+        log.error(message);
         saveLog(LogLevel.ERROR, message);
     }
 
     public void logError(String message, Object data) {
-        log.info(message, data);
+        log.error(message, data);
         saveLog(LogLevel.ERROR, message);
     }
 
