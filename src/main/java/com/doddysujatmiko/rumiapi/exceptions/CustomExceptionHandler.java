@@ -63,16 +63,21 @@ public class CustomExceptionHandler {
         return responser.response(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleException(Exception exception) {
-        var conciseStackTrace = "StackTrace" + Arrays
-                .stream(exception.getCause().getStackTrace())
-                .limit(3)
+    private String constructConciseStackTrace(Throwable t, Integer maxIndex) {
+        var stackTrace = t.getStackTrace();
+        if(t.getCause() != null) stackTrace = t.getCause().getStackTrace();
+        return  "StackTrace" + Arrays
+                .stream(stackTrace)
+                .limit(maxIndex)
                 .map(element -> "," + element.getClassName() +
                         "/" + element.getMethodName() +
                         "/" + element.getLineNumber())
                 .collect(Collectors.joining());
+    }
 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<?> handleException(Exception exception) {
+        var conciseStackTrace = constructConciseStackTrace(exception, 3);
         logService.logError(conciseStackTrace);
         if(Objects.equals(environment.getActiveProfiles()[0], "dev"))
             return responser.response(HttpStatus.INTERNAL_SERVER_ERROR, "[UNHANDLED EXCEPTION] " + conciseStackTrace);
@@ -82,14 +87,7 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler(Error.class)
     public ResponseEntity<?> handleError(Error error) {
-        var conciseStackTrace = "StackTrace" + Arrays
-                .stream(error.getCause().getStackTrace())
-                .limit(3)
-                .map(element -> "," + element.getClassName() +
-                        "/" + element.getMethodName() +
-                        "/" + element.getLineNumber())
-                .collect(Collectors.joining());
-
+        var conciseStackTrace = constructConciseStackTrace(error, 3);
         logService.logError(conciseStackTrace);
         if(Objects.equals(environment.getActiveProfiles()[0], "dev"))
             return responser.response(HttpStatus.INTERNAL_SERVER_ERROR, "[UNHANDLED ERROR] " + conciseStackTrace);
