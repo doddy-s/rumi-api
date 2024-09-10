@@ -49,7 +49,7 @@ public class ConsumetService {
         anime.setHasConsumetsCache(true);
         for(var provider : ProviderEnum.values()) {
             try {
-                consumetEntities.addAll(search(anime.getTitle(), provider));
+                consumetEntities.addAll(search(anime.getTitle(), provider).stream().limit(4).toList());
             } catch (NullPointerException exception) {
                 anime.setHasConsumetsCache(false);
             }
