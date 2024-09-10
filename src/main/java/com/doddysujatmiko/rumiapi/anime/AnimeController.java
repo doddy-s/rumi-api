@@ -1,9 +1,7 @@
 package com.doddysujatmiko.rumiapi.anime;
 
 import com.doddysujatmiko.rumiapi.common.utils.Responser;
-import com.doddysujatmiko.rumiapi.consumet.enums.ProviderEnum;
 import com.doddysujatmiko.rumiapi.consumet.enums.ServerEnum;
-import com.doddysujatmiko.rumiapi.jikan.JikanService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -76,13 +74,12 @@ public class AnimeController {
         return responser.response(HttpStatus.OK, "Success", animeService.readEpisodes(consumetId));
     }
 
-    @GetMapping("/episodes/{provider}/{consumetId}/")
+    @GetMapping("/episodes/hls/{consumetId}/")
     public ResponseEntity<?> getEpisodeServers(
             @PathVariable String consumetId,
-            @PathVariable ProviderEnum provider,
             @RequestParam(required = false, defaultValue = "VIDSTREAMING") ServerEnum server
             ) {
         return responser.response(HttpStatus.OK, "Success",
-                animeService.readEpisodeServers(consumetId, provider, server));
+                animeService.readServer(consumetId, server));
     }
 }

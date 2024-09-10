@@ -121,7 +121,8 @@ public class AnimeService {
         return consumetService.readEpisodes(consumetId);
     }
 
-    public Object readEpisodeServers(String consumetId, ProviderEnum provider, ServerEnum server) {
-        return consumetService.readEpisodeServers(consumetId, provider, server);
+    @Transactional
+    public Object readServer(String consumetId, ServerEnum server) {
+        return consumetService.readServer(consumetId, server);
     }
 }

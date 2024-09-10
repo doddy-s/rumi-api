@@ -4,6 +4,7 @@ import com.doddysujatmiko.rumiapi.consumet.dtos.ConsumetEpisodeDto;
 import com.doddysujatmiko.rumiapi.consumet.dtos.ConsumetServerDto;
 import com.doddysujatmiko.rumiapi.consumet.enums.ProviderEnum;
 import com.doddysujatmiko.rumiapi.consumet.enums.ServerEnum;
+import com.doddysujatmiko.rumiapi.consumet.schema.ConsumetEpisodeSchema;
 import com.doddysujatmiko.rumiapi.exceptions.InternalServerErrorException;
 import com.doddysujatmiko.rumiapi.exceptions.NotFoundException;
 import com.doddysujatmiko.rumiapi.log.LogService;
@@ -87,17 +88,18 @@ public class ConsumetService {
         return consumetEntities;
     }
 
-    public List<ConsumetEpisodeDto> readEpisodes(String consumetId) {
+    public ConsumetEpisodeSchema readEpisodes(String consumetId) {
         List<ConsumetEpisodeEntity> episodeEntities = new ArrayList<>();
+        ConsumetAnimeEntity consumetAnime;
 
         try {
-            var consumet = consumetAnimeRepository.findByConsumetId(consumetId);
+            consumetAnime = consumetAnimeRepository.findByConsumetId(consumetId);
 
-            if(consumet == null) throw new NotFoundException("Consumet not found");
+            if(consumetAnime == null) throw new NotFoundException("Consumet not found");
 
             var restTemplate = new RestTemplate();
 
-            String url = switch (consumet.getProvider()) {
+            String url = switch (consumetAnime.getProvider()) {
                 case ProviderEnum.HIANIME -> consumetApi + "/anime/zoro/info?id=" + consumetId;
                 case ProviderEnum.GOGOANIME -> consumetApi + "/anime/gogoanime/info/" + consumetId;
             };
@@ -112,7 +114,7 @@ public class ConsumetService {
                         .findByConsumetId(episodes.getJSONObject(i).getString("id"));
                 if(episode == null)
                     episode = consumetEpisodeRepository
-                            .save(consumetMapper.toConsumetEpisodeEntity(episodes.getJSONObject(i), consumet));
+                            .save(consumetMapper.toConsumetEpisodeEntity(episodes.getJSONObject(i), consumetAnime));
                 episodeEntities.add(episode);
             }
 
@@ -121,10 +123,13 @@ public class ConsumetService {
             throw new InternalServerErrorException(t.getMessage());
         }
 
-        return episodeEntities.stream().map(ConsumetEpisodeDto::fromEntity).toList();
+        var schema = new ConsumetEpisodeSchema();
+        schema.setProvider(consumetAnime.getProvider());
+        schema.setList(episodeEntities.stream().map(ConsumetEpisodeDto::fromEntity).toList());
+        return schema;
     }
 
-    public List<ConsumetServerDto> readEpisodeServers(String consumetId, ProviderEnum provider, ServerEnum server) {
+    public List<ConsumetServerDto> readServer(String consumetId, ServerEnum server) {
         List<ConsumetServerEntity> serverEntities = new ArrayList<>();
 
         try {
@@ -134,7 +139,7 @@ public class ConsumetService {
 
             var restTemplate = new RestTemplate();
 
-            String branch = switch (provider) {
+            String branch = switch (episode.getConsumetAnime().getProvider()) {
                 case ProviderEnum.HIANIME -> "zoro";
                 case ProviderEnum.GOGOANIME -> "gogoanime";
             };
