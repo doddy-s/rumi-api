@@ -1,5 +1,6 @@
 package com.doddysujatmiko.rumiapi.consumet;
 
+import com.doddysujatmiko.rumiapi.anime.AnimeEntity;
 import com.doddysujatmiko.rumiapi.consumet.dtos.ConsumetEpisodeDto;
 import com.doddysujatmiko.rumiapi.consumet.dtos.ConsumetServerDto;
 import com.doddysujatmiko.rumiapi.consumet.enums.ProviderEnum;
@@ -15,7 +16,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -29,6 +32,9 @@ public class ConsumetService {
     @Value("${CONSUMET_API_HOST}")
     String consumetApi;
 
+    @Value("${consumet.cache.minutes}")
+    Integer cacheTtl;
+
     @Autowired
     public ConsumetService(ConsumetMapper consumetMapper, ConsumetAnimeRepository consumetAnimeRepository, LogService logService, ConsumetEpisodeRepository consumetEpisodeRepository, ConsumetServerRepository consumetServerRepository) {
         this.consumetMapper = consumetMapper;
@@ -38,21 +44,22 @@ public class ConsumetService {
         this.consumetServerRepository = consumetServerRepository;
     }
 
-    public List<ConsumetAnimeEntity> readRelatedStreams(String query) {
-        var hianime = search(query, ProviderEnum.HIANIME);
-        var gogoanime = search(query, ProviderEnum.GOGOANIME);
-
+    public List<ConsumetAnimeEntity> readRelatedStreams(AnimeEntity anime) {
         List<ConsumetAnimeEntity> consumetEntities = new ArrayList<>();
 
-        for(int i = 0; i < 3; i++) {
-            if(i < hianime.size()) consumetEntities.add(hianime.get(i));
-            if(i < gogoanime.size()) consumetEntities.add(gogoanime.get(i));
+        anime.setHasConsumetsCache(true);
+        for(var provider : ProviderEnum.values()) {
+            try {
+                consumetEntities.addAll(search(anime.getTitle(), provider));
+            } catch (NullPointerException exception) {
+                anime.setHasConsumetsCache(false);
+            }
         }
 
         return consumetEntities;
     }
 
-    private List<ConsumetAnimeEntity> search(String query, ProviderEnum provider) {
+    private List<ConsumetAnimeEntity> search(String query, ProviderEnum provider) throws NullPointerException {
         List<ConsumetAnimeEntity> consumetEntities = new ArrayList<>();
 
         query = query.replaceAll("[^a-zA-Z0-9 ]", "");
@@ -77,12 +84,12 @@ public class ConsumetService {
                 var consumet = consumetAnimeRepository.findByConsumetId(streams.getJSONObject(i).getString("id"));
                 if(consumet == null)
                     consumet = consumetAnimeRepository.save(
-                            consumetMapper.toConsumetEntity(streams.getJSONObject(i), provider));
+                            consumetMapper.toConsumetAnimeEntity(streams.getJSONObject(i), provider));
                 consumetEntities.add(consumet);
             }
         } catch (Throwable t) {
             logService.logError("Error consumet search on provider "+provider+" with message "+t.getMessage());
-            return new ArrayList<>();
+            throw new NullPointerException("Provider has trouble");
         }
 
         return consumetEntities;
@@ -94,8 +101,24 @@ public class ConsumetService {
 
         try {
             consumetAnime = consumetAnimeRepository.findByConsumetId(consumetId);
-
             if(consumetAnime == null) throw new NotFoundException("Consumet not found");
+
+
+            var cacheTime = consumetAnime.getConsumetEpisodesCacheDate() != null ?
+                    consumetAnime.getConsumetEpisodesCacheDate().getTime() : 0;
+
+            boolean ignoreCache = false;
+            if(cacheTime + (cacheTtl * 60 * 1000) < (new Date()).getTime())
+                if(consumetAnime.getAnimes().stream().anyMatch(AnimeEntity::isAiring)) ignoreCache = true;
+
+            if(consumetAnime.getHasConsumetEpisodesCache() && !ignoreCache) {
+                logService.logInfo("Cache hit on retrieving episodes of "+consumetAnime.getTitle());
+                var schema = new ConsumetEpisodeSchema();
+                schema.setProvider(consumetAnime.getProvider());
+                schema.setList(consumetAnime.getConsumetEpisodes()
+                        .stream().map(ConsumetEpisodeDto::fromEntity).toList());
+                return schema;
+            }
 
             var restTemplate = new RestTemplate();
 
@@ -118,6 +141,9 @@ public class ConsumetService {
                 episodeEntities.add(episode);
             }
 
+            consumetAnime.setHasConsumetEpisodesCache(true);
+            consumetAnime.setConsumetEpisodesCacheDate(new Date());
+            consumetAnimeRepository.save(consumetAnime);
 
         } catch (Throwable t) {
             throw new InternalServerErrorException(t.getMessage());

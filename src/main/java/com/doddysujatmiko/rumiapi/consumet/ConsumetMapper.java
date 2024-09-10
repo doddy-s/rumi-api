@@ -8,13 +8,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ConsumetMapper {
-    public ConsumetAnimeEntity toConsumetEntity(JSONObject consumet, ProviderEnum by) {
+    public ConsumetAnimeEntity toConsumetAnimeEntity(JSONObject consumet, ProviderEnum by) {
         return ConsumetAnimeEntity.builder()
                 .malId(consumet.optInt("malId", 0))
                 .consumetId(consumet.optString("id", null))
                 .title(consumet.optString("title", null))
                 .image(consumet.optString("image", null))
                 .provider(by)
+                .hasConsumetEpisodesCache(false)
                 .build();
     }
 

@@ -7,7 +7,6 @@ import com.doddysujatmiko.rumiapi.anime.enums.SeasonEnum;
 import com.doddysujatmiko.rumiapi.common.SimplePage;
 import com.doddysujatmiko.rumiapi.consumet.ConsumetService;
 import com.doddysujatmiko.rumiapi.consumet.dtos.ConsumetDto;
-import com.doddysujatmiko.rumiapi.consumet.enums.ProviderEnum;
 import com.doddysujatmiko.rumiapi.consumet.enums.ServerEnum;
 import com.doddysujatmiko.rumiapi.exceptions.NotFoundException;
 import com.doddysujatmiko.rumiapi.jikan.JikanService;
@@ -104,11 +103,10 @@ public class AnimeService {
 
         if(animeEntity == null) animeEntity = jikanService.readOne(malId);
         if(animeEntity == null) throw new NotFoundException("Anime not found");
-        if(!(animeEntity.getConsumets() == null))
-            if(!animeEntity.getConsumets().isEmpty())
-                return animeEntity.getConsumets().stream().map(ConsumetDto::fromEntity).toList();
+        if(animeEntity.getHasConsumetsCache())
+            return animeEntity.getConsumets().stream().map(ConsumetDto::fromEntity).toList();
 
-        var consumets = consumetService.readRelatedStreams(animeEntity.getTitle());
+        var consumets = consumetService.readRelatedStreams(animeEntity);
 
         animeEntity.setConsumets(consumets);
 
@@ -117,6 +115,7 @@ public class AnimeService {
         return consumets.stream().map(ConsumetDto::fromEntity).toList();
     }
 
+    @Transactional
     public Object readEpisodes(String consumetId) {
         return consumetService.readEpisodes(consumetId);
     }

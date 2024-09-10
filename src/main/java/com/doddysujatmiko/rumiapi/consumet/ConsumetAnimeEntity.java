@@ -6,7 +6,9 @@ import com.doddysujatmiko.rumiapi.consumet.enums.ProviderEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -34,4 +36,9 @@ public class ConsumetAnimeEntity extends BaseEntity {
 
     @OneToMany(mappedBy = "consumetAnime", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<ConsumetEpisodeEntity> consumetEpisodes;
+
+    private Boolean hasConsumetEpisodesCache;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date consumetEpisodesCacheDate;
 }

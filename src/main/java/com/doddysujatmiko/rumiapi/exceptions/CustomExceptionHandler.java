@@ -80,7 +80,8 @@ public class CustomExceptionHandler {
         var conciseStackTrace = constructConciseStackTrace(exception, 3);
         logService.logError(conciseStackTrace);
         if(Objects.equals(environment.getActiveProfiles()[0], "dev"))
-            return responser.response(HttpStatus.INTERNAL_SERVER_ERROR, "[UNHANDLED EXCEPTION] " + conciseStackTrace);
+            return responser.response(HttpStatus.INTERNAL_SERVER_ERROR, "[UNHANDLED EXCEPTION] " +
+                    exception.getMessage() + conciseStackTrace);
 
         return responser.response(HttpStatus.INTERNAL_SERVER_ERROR, "[UNHANDLED EXCEPTION] " + exception.getMessage());
     }
@@ -90,7 +91,8 @@ public class CustomExceptionHandler {
         var conciseStackTrace = constructConciseStackTrace(error, 3);
         logService.logError(conciseStackTrace);
         if(Objects.equals(environment.getActiveProfiles()[0], "dev"))
-            return responser.response(HttpStatus.INTERNAL_SERVER_ERROR, "[UNHANDLED ERROR] " + conciseStackTrace);
+            return responser.response(HttpStatus.INTERNAL_SERVER_ERROR, "[UNHANDLED ERROR] " +
+                    error.getMessage() + conciseStackTrace);
 
         return responser.response(HttpStatus.INTERNAL_SERVER_ERROR, "[UNHANDLED ERROR] " + error.getMessage());
     }

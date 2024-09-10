@@ -72,6 +72,7 @@ public class JikanMapper {
                         null : SeasonEnum.valueOf(anime.optString("season").toUpperCase()))
                 .genres(genreEntities)
                 .studios(studioEntities)
+                .hasConsumetsCache(false)
                 .build();
     }
 

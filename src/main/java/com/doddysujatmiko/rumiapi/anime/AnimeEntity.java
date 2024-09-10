@@ -6,6 +6,7 @@ import com.doddysujatmiko.rumiapi.consumet.ConsumetAnimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,4 +78,21 @@ public class AnimeEntity extends BaseEntity {
             }
     )
     private List<ConsumetAnimeEntity> consumets = new ArrayList<>();
+
+    private Boolean hasConsumetsCache = false;
+
+    public Boolean isAiring() {
+        var month = LocalDate.now().getMonthValue();
+        SeasonEnum currentSeason = switch (month) {
+            case 1, 2, 3 -> SeasonEnum.WINTER;
+            case 4, 5, 6 -> SeasonEnum.SPRING;
+            case 7, 8, 9 -> SeasonEnum.SUMMER;
+            case 10, 11, 12 -> SeasonEnum.FALL;
+            default -> throw new IllegalStateException("Unexpected value: " + month);
+        };
+
+        var year = LocalDate.now().getYear();
+
+        return season == currentSeason && this.year == year;
+    }
 }
