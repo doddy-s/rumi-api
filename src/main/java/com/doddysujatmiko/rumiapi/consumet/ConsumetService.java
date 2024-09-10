@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -32,7 +31,7 @@ public class ConsumetService {
     @Value("${CONSUMET_API_HOST}")
     String consumetApi;
 
-    @Value("${consumet.cache.minutes}")
+    @Value("${consumet.cache.ttl}")
     Integer cacheTtl;
 
     @Autowired
@@ -102,7 +101,6 @@ public class ConsumetService {
         try {
             consumetAnime = consumetAnimeRepository.findByConsumetId(consumetId);
             if(consumetAnime == null) throw new NotFoundException("Consumet not found");
-
 
             var cacheTime = consumetAnime.getConsumetEpisodesCacheDate() != null ?
                     consumetAnime.getConsumetEpisodesCacheDate().getTime() : 0;

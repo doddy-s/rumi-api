@@ -16,6 +16,8 @@ import java.util.List;
 public class ConsumetEpisodeEntity extends BaseEntity {
     private String consumetId;
 
+    private Integer number;
+
     private String title;
 
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH}, fetch = FetchType.LAZY)

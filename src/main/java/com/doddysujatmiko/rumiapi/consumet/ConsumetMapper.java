@@ -22,6 +22,7 @@ public class ConsumetMapper {
     public ConsumetEpisodeEntity toConsumetEpisodeEntity(JSONObject episode, ConsumetAnimeEntity consumetAnimeEntity) {
         return ConsumetEpisodeEntity.builder()
                 .consumetId(episode.optString("id", null))
+                .number(episode.optInt("number", 0))
                 .title(episode.optString("title", episode.optString("id", null)))
                 .consumetAnime(consumetAnimeEntity)
                 .build();

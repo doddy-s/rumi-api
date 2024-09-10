@@ -13,11 +13,14 @@ import lombok.NoArgsConstructor;
 public class ConsumetEpisodeDto {
     private String consumetId;
 
+    private Integer number;
+
     private String title;
 
     public static ConsumetEpisodeDto fromEntity(ConsumetEpisodeEntity consumetEpisodeEntity) {
         return ConsumetEpisodeDto.builder()
                 .consumetId(consumetEpisodeEntity.getConsumetId())
+                .number(consumetEpisodeEntity.getNumber())
                 .title(consumetEpisodeEntity.getTitle())
                 .build();
     }
