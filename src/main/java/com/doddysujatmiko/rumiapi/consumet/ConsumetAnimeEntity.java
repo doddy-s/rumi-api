@@ -3,11 +3,13 @@ package com.doddysujatmiko.rumiapi.consumet;
 import com.doddysujatmiko.rumiapi.anime.AnimeEntity;
 import com.doddysujatmiko.rumiapi.common.BaseEntity;
 import com.doddysujatmiko.rumiapi.consumet.enums.ProviderEnum;
+import com.doddysujatmiko.rumiapi.history.HistoryEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -41,4 +43,7 @@ public class ConsumetAnimeEntity extends BaseEntity {
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date consumetEpisodesCacheDate;
+
+    @OneToMany(mappedBy = "consumetAnime", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<HistoryEntity> histories = new ArrayList<>();
 }

@@ -1,6 +1,8 @@
 package com.doddysujatmiko.rumiapi.auth;
 
 import com.doddysujatmiko.rumiapi.common.BaseEntity;
+import com.doddysujatmiko.rumiapi.consumet.ConsumetServerEntity;
+import com.doddysujatmiko.rumiapi.history.HistoryEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -42,6 +44,8 @@ public class UserEntity extends BaseEntity implements UserDetails {
     )
     private List<RoleEntity> roles = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<HistoryEntity> histories = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
