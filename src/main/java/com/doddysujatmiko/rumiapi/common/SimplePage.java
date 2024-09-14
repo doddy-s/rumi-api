@@ -1,5 +1,6 @@
 package com.doddysujatmiko.rumiapi.common;
 
+import com.doddysujatmiko.rumiapi.anime.dtos.AnimeDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -7,6 +8,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -32,6 +35,15 @@ public class SimplePage<T> {
                 .maxPage(page.getTotalPages() - 1)
                 .currentPage(page.getNumber())
                 .hasNextPage(page.hasNext())
+                .build();
+    }
+
+    public static <oldType, newType> SimplePage<newType> changeListType(SimplePage<oldType> sp, Function<oldType, newType> mapper) {
+        return SimplePage.<newType>builder()
+                .maxPage(sp.getMaxPage())
+                .currentPage(sp.getCurrentPage())
+                .hasNextPage(sp.isHasNextPage())
+                .list(sp.getList().stream().map(mapper).toList())
                 .build();
     }
 }

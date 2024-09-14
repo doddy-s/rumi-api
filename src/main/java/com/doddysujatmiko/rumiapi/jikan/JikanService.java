@@ -30,8 +30,8 @@ public class JikanService {
     @Value("${jikan.api.root}")
     String jikanApi;
 
-    public SimplePage readCurrentSeasonAnimes(int page) {
-        SimplePage simplePage;
+    public SimplePage<AnimeEntity> readCurrentSeasonAnimes(int page) {
+        SimplePage<AnimeEntity> simplePage;
 
         try {
             var restTemplate = new RestTemplate();
@@ -66,8 +66,8 @@ public class JikanService {
         return genreEntities;
     }
 
-    public SimplePage readAllAnimes(Integer page) {
-        SimplePage simplePage;
+    public SimplePage<AnimeEntity> readAllAnimes(Integer page) {
+        SimplePage<AnimeEntity> simplePage;
 
         try {
             var restTemplate = new RestTemplate();
@@ -81,8 +81,8 @@ public class JikanService {
         return simplePage;
     }
 
-    public SimplePage searchAnime(String query, Integer page) {
-        SimplePage simplePage;
+    public SimplePage<AnimeEntity> searchAnime(String query, Integer page) {
+        SimplePage<AnimeEntity> simplePage;
 
         try {
             var restTemplate = new RestTemplate();
@@ -98,8 +98,8 @@ public class JikanService {
         return simplePage;
     }
 
-    public SimplePage readTopAnime() {
-        SimplePage simplePage;
+    public SimplePage<AnimeEntity> readTopAnime() {
+        SimplePage<AnimeEntity> simplePage;
 
         try {
             var restTemplate = new RestTemplate();

@@ -22,8 +22,11 @@ public class AnimeController {
     }
 
     @GetMapping("season/current")
-    public ResponseEntity<?> getCurrentSeasonAnimes(@RequestParam(required = false, defaultValue = "0") Integer page) {
-            return responser.response(HttpStatus.OK, "Success", animeService.readCurrentSeasonAnimes(page));
+    public ResponseEntity<?> getCurrentSeasonAnimes(
+            @RequestParam(required = false, defaultValue = "0") Integer page,
+            @RequestParam(required = false, defaultValue = "25") Integer size
+    ) {
+            return responser.response(HttpStatus.OK, "Success", animeService.readCurrentSeasonAnimes(page, size));
     }
 
     @GetMapping("/genre")
@@ -47,10 +50,12 @@ public class AnimeController {
         return responser.response(HttpStatus.OK, "Success", animeService.readAnimesByStudio(masStudioId));
     }
 
-    @GetMapping("/search/{query}/{page}")
+    @GetMapping("/search/{query}")
     public ResponseEntity<?> getWithQuery(
             @PathVariable String query,
-            @PathVariable Integer page) {
+            @RequestParam(required = false, defaultValue = "0") Integer page,
+            @RequestParam(required = false, defaultValue = "25") Integer size
+    ) {
         return responser.response(HttpStatus.OK, "Success", animeService.searchAnime(query, page));
     }
 

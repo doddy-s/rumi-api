@@ -83,7 +83,7 @@ public class JikanMapper {
                 .build();
     }
 
-    public SimplePage toSimplePage(String response) {
+    public SimplePage<AnimeEntity> toSimplePage(String response) {
         List<AnimeEntity> animeEntities = new ArrayList<>();
 
         JSONObject responseJson = new JSONObject(response);
@@ -104,11 +104,11 @@ public class JikanMapper {
             animeEntities.add(animeEntity);
         }
 
-        var simplePage = new SimplePage();
+        var simplePage = new SimplePage<AnimeEntity>();
         simplePage.setMaxPage(pagination.optInt("last_visible_page", 0) - 1);
         simplePage.setCurrentPage(pagination.optInt("current_page", 0) - 1);
         simplePage.setHasNextPage(pagination.optBoolean("has_next_page", false));
-        simplePage.setList(animeEntities.stream().map(AnimeDto::fromEntity).toList());
+        simplePage.setList(animeEntities);
 
         return simplePage;
     }

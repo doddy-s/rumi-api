@@ -78,7 +78,7 @@ public class CustomExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleException(Exception exception) {
         var conciseStackTrace = constructConciseStackTrace(exception, 3);
-        logService.logError(conciseStackTrace);
+        logService.logError(exception.getMessage()+","+conciseStackTrace);
         if(Objects.equals(environment.getActiveProfiles()[0], "dev"))
             return responser.response(HttpStatus.INTERNAL_SERVER_ERROR, "[UNHANDLED EXCEPTION] " +
                     exception.getMessage() + conciseStackTrace);
@@ -89,7 +89,7 @@ public class CustomExceptionHandler {
     @ExceptionHandler(Error.class)
     public ResponseEntity<?> handleError(Error error) {
         var conciseStackTrace = constructConciseStackTrace(error, 3);
-        logService.logError(conciseStackTrace);
+        logService.logError(error.getMessage()+","+conciseStackTrace);
         if(Objects.equals(environment.getActiveProfiles()[0], "dev"))
             return responser.response(HttpStatus.INTERNAL_SERVER_ERROR, "[UNHANDLED ERROR] " +
                     error.getMessage() + conciseStackTrace);

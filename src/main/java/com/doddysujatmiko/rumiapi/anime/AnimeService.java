@@ -45,7 +45,8 @@ public class AnimeService {
         this.consumetEpisodeRepository = consumetEpisodeRepository;
     }
 
-    public Object readCurrentSeasonAnimes(Integer page) {
+    @Transactional
+    public SimplePage<AnimeDto> readCurrentSeasonAnimes(Integer page, Integer size) {
         var month = LocalDate.now().getMonthValue();
         SeasonEnum currentSeason = switch (month) {
             case 1, 2, 3 -> SeasonEnum.WINTER;
@@ -57,7 +58,7 @@ public class AnimeService {
 
         var animePage = animeRepository.findByYearAndSeason(LocalDate.now().getYear(),
                 currentSeason,
-                PageRequest.of(page, 25));
+                PageRequest.of(page, size));
 
         var sp = SimplePage.<AnimeDto>fromPageWithEmptyList(animePage);
         sp.setList(animePage.getContent().stream().map(AnimeDto::fromEntity).toList());
@@ -65,12 +66,16 @@ public class AnimeService {
         return sp;
     }
 
-    public Object searchAnime(String query, Integer page) {
-        return jikanService.searchAnime(query, page);
+    @Transactional
+    public SimplePage<AnimeDto> searchAnime(String query, Integer page) {
+        var sp = jikanService.searchAnime(query, page);
+
+        return SimplePage.changeListType(sp, AnimeDto::fromEntity);
     }
 
-    public Object readTopAnime() {
-        return jikanService.readTopAnime();
+    @Transactional
+    public SimplePage<AnimeDto> readTopAnime() {
+        return SimplePage.changeListType(jikanService.readTopAnime(), AnimeDto::fromEntity);
     }
 
     public Object readGenres() {
