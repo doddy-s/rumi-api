@@ -4,7 +4,6 @@ import com.doddysujatmiko.rumiapi.auth.UserEntity;
 import com.doddysujatmiko.rumiapi.auth.UserRepository;
 import com.doddysujatmiko.rumiapi.auth.dtos.UserDto;
 import com.doddysujatmiko.rumiapi.common.SimplePage;
-import com.doddysujatmiko.rumiapi.consumet.ConsumetAnimeRepository;
 import com.doddysujatmiko.rumiapi.consumet.ConsumetEpisodeRepository;
 import com.doddysujatmiko.rumiapi.exceptions.NotFoundException;
 import com.doddysujatmiko.rumiapi.history.dtos.HistoryDto;
