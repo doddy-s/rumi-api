@@ -1,6 +1,5 @@
 package com.doddysujatmiko.rumiapi.common;
 
-import com.doddysujatmiko.rumiapi.anime.dtos.AnimeDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,7 +8,6 @@ import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
