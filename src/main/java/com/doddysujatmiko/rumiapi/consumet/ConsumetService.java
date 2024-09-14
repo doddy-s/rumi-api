@@ -1,11 +1,8 @@
 package com.doddysujatmiko.rumiapi.consumet;
 
 import com.doddysujatmiko.rumiapi.anime.AnimeEntity;
-import com.doddysujatmiko.rumiapi.consumet.dtos.ConsumetEpisodeDto;
-import com.doddysujatmiko.rumiapi.consumet.dtos.ConsumetServerDto;
 import com.doddysujatmiko.rumiapi.consumet.enums.ProviderEnum;
 import com.doddysujatmiko.rumiapi.consumet.enums.ServerEnum;
-import com.doddysujatmiko.rumiapi.consumet.schema.ConsumetEpisodeSchema;
 import com.doddysujatmiko.rumiapi.exceptions.InternalServerErrorException;
 import com.doddysujatmiko.rumiapi.exceptions.NotFoundException;
 import com.doddysujatmiko.rumiapi.log.LogService;
@@ -94,7 +91,7 @@ public class ConsumetService {
         return consumetEntities;
     }
 
-    public ConsumetEpisodeSchema readEpisodes(String consumetId) {
+    public List<ConsumetEpisodeEntity> readEpisodes(String consumetId) {
         List<ConsumetEpisodeEntity> episodeEntities = new ArrayList<>();
         ConsumetAnimeEntity consumetAnime;
 
@@ -111,11 +108,7 @@ public class ConsumetService {
 
             if(consumetAnime.getHasConsumetEpisodesCache() && !ignoreCache) {
                 logService.logInfo("Cache hit on retrieving episodes of "+consumetAnime.getTitle());
-                var schema = new ConsumetEpisodeSchema();
-                schema.setProvider(consumetAnime.getProvider());
-                schema.setList(consumetAnime.getConsumetEpisodes()
-                        .stream().map(ConsumetEpisodeDto::fromEntity).toList());
-                return schema;
+                return consumetAnime.getConsumetEpisodes();
             }
 
             var restTemplate = new RestTemplate();
@@ -147,13 +140,10 @@ public class ConsumetService {
             throw new InternalServerErrorException(t.getMessage());
         }
 
-        var schema = new ConsumetEpisodeSchema();
-        schema.setProvider(consumetAnime.getProvider());
-        schema.setList(episodeEntities.stream().map(ConsumetEpisodeDto::fromEntity).toList());
-        return schema;
+        return episodeEntities;
     }
 
-    public List<ConsumetServerDto> readServer(String consumetId, ServerEnum server) {
+    public List<ConsumetServerEntity> readServers(String consumetId, ServerEnum server) {
         List<ConsumetServerEntity> serverEntities = new ArrayList<>();
 
         try {
@@ -190,6 +180,6 @@ public class ConsumetService {
             throw new InternalServerErrorException(t.getMessage());
         }
 
-        return serverEntities.stream().map(ConsumetServerDto::fromEntity).toList();
+        return serverEntities;
     }
 }

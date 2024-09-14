@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ConsumetDto {
+public class ConsumetAnimeDto {
 //    private Integer malId;
 
     private String consumetId;
@@ -25,8 +25,8 @@ public class ConsumetDto {
     @Enumerated(EnumType.STRING)
     private ProviderEnum provider;
 
-    public static ConsumetDto fromEntity(ConsumetAnimeEntity consumetAnimeEntity) {
-        return ConsumetDto.builder()
+    public static ConsumetAnimeDto fromEntity(ConsumetAnimeEntity consumetAnimeEntity) {
+        return ConsumetAnimeDto.builder()
 //                .malId(consumetEntity.getMalId() == 0 ? null : consumetEntity.getMalId())
                 .consumetId(consumetAnimeEntity.getConsumetId())
                 .title(consumetAnimeEntity.getTitle())

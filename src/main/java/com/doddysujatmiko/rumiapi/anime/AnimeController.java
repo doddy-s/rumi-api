@@ -31,10 +31,10 @@ public class AnimeController {
         return responser.response(HttpStatus.OK, "Success", animeService.readGenres());
     }
 
-    @GetMapping("/genre/{malId}")
+    @GetMapping("/genre/{malGenreId}")
     public ResponseEntity<?> getByGenre(
-            @PathVariable Integer malId) {
-        return responser.response(HttpStatus.OK, "Success", animeService.readAnimesByGenre(malId));
+            @PathVariable Integer malGenreId) {
+        return responser.response(HttpStatus.OK, "Success", animeService.readAnimesByGenre(malGenreId));
     }
 
     @GetMapping("/studio")
@@ -42,9 +42,9 @@ public class AnimeController {
         return responser.response(HttpStatus.OK, "Success", animeService.readStudios());
     }
 
-    @GetMapping("/studio/{malId}")
-    public ResponseEntity<?> getByStudio(@PathVariable Integer malId) {
-        return responser.response(HttpStatus.OK, "Success", animeService.readAnimesByStudio(malId));
+    @GetMapping("/studio/{masStudioId}")
+    public ResponseEntity<?> getByStudio(@PathVariable Integer masStudioId) {
+        return responser.response(HttpStatus.OK, "Success", animeService.readAnimesByStudio(masStudioId));
     }
 
     @GetMapping("/search/{query}/{page}")
@@ -59,27 +59,27 @@ public class AnimeController {
         return responser.response(HttpStatus.OK, "Success", animeService.readTopAnime());
     }
 
-    @GetMapping("/{malId}")
-    public ResponseEntity<?> getByMalId(@PathVariable Integer malId) {
-        return responser.response(HttpStatus.OK, "Success", animeService.readOne(malId));
+    @GetMapping("/{malAnimeId}")
+    public ResponseEntity<?> getByMalId(@PathVariable Integer malAnimeId) {
+        return responser.response(HttpStatus.OK, "Success", animeService.readOne(malAnimeId));
     }
 
-    @GetMapping("/stream/{malId}")
-    public ResponseEntity<?> getStreamByMalId(@PathVariable Integer malId) {
-        return responser.response(HttpStatus.OK, "Success", animeService.readRelatedStreams(malId));
+    @GetMapping("/stream/{malAnimeId}")
+    public ResponseEntity<?> getStreamByMalId(@PathVariable Integer malAnimeId) {
+        return responser.response(HttpStatus.OK, "Success", animeService.readRelatedStreams(malAnimeId));
     }
 
-    @GetMapping("/episodes/{consumetId}")
-    public ResponseEntity<?> getEpisodesByConsumetId(@PathVariable String consumetId) {
-        return responser.response(HttpStatus.OK, "Success", animeService.readEpisodes(consumetId));
+    @GetMapping("/episode/{consumetAnimeId}")
+    public ResponseEntity<?> getEpisodesByConsumetId(@PathVariable String consumetAnimeId) {
+        return responser.response(HttpStatus.OK, "Success", animeService.readEpisodes(consumetAnimeId));
     }
 
-    @GetMapping("/episodes/hls/{consumetId}/")
+    @GetMapping("/server/{consumetEpisodeId}")
     public ResponseEntity<?> getEpisodeServers(
-            @PathVariable String consumetId,
+            @PathVariable String consumetEpisodeId,
             @RequestParam(required = false, defaultValue = "VIDSTREAMING") ServerEnum server
             ) {
         return responser.response(HttpStatus.OK, "Success",
-                animeService.readServer(consumetId, server));
+                animeService.readServer(consumetEpisodeId, server));
     }
 }

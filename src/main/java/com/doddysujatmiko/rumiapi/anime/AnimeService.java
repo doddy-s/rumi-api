@@ -4,9 +4,16 @@ import com.doddysujatmiko.rumiapi.anime.dtos.AnimeDto;
 import com.doddysujatmiko.rumiapi.anime.dtos.GenreDto;
 import com.doddysujatmiko.rumiapi.anime.dtos.StudioDto;
 import com.doddysujatmiko.rumiapi.anime.enums.SeasonEnum;
+import com.doddysujatmiko.rumiapi.anime.schemas.GetEpisodeSchema;
+import com.doddysujatmiko.rumiapi.anime.schemas.GetServerSchema;
+import com.doddysujatmiko.rumiapi.anime.schemas.GetStreamSchema;
 import com.doddysujatmiko.rumiapi.common.SimplePage;
+import com.doddysujatmiko.rumiapi.consumet.ConsumetAnimeRepository;
+import com.doddysujatmiko.rumiapi.consumet.ConsumetEpisodeRepository;
 import com.doddysujatmiko.rumiapi.consumet.ConsumetService;
-import com.doddysujatmiko.rumiapi.consumet.dtos.ConsumetDto;
+import com.doddysujatmiko.rumiapi.consumet.dtos.ConsumetAnimeDto;
+import com.doddysujatmiko.rumiapi.consumet.dtos.ConsumetEpisodeDto;
+import com.doddysujatmiko.rumiapi.consumet.dtos.ConsumetServerDto;
 import com.doddysujatmiko.rumiapi.consumet.enums.ServerEnum;
 import com.doddysujatmiko.rumiapi.exceptions.NotFoundException;
 import com.doddysujatmiko.rumiapi.jikan.JikanService;
@@ -24,14 +31,18 @@ public class AnimeService {
     private final StudioRepository studioRepository;
     private final JikanService jikanService;
     private final ConsumetService consumetService;
+    private final ConsumetAnimeRepository consumetAnimeRepository;
+    private final ConsumetEpisodeRepository consumetEpisodeRepository;
 
     @Autowired
-    public AnimeService(AnimeRepository animeRepository, GenreRepository genreRepository, StudioRepository studioRepository, JikanService jikanService, ConsumetService consumetService) {
+    public AnimeService(AnimeRepository animeRepository, GenreRepository genreRepository, StudioRepository studioRepository, JikanService jikanService, ConsumetService consumetService, ConsumetAnimeRepository consumetAnimeRepository, ConsumetEpisodeRepository consumetEpisodeRepository) {
         this.animeRepository = animeRepository;
         this.genreRepository = genreRepository;
         this.studioRepository = studioRepository;
         this.jikanService = jikanService;
         this.consumetService = consumetService;
+        this.consumetAnimeRepository = consumetAnimeRepository;
+        this.consumetEpisodeRepository = consumetEpisodeRepository;
     }
 
     public Object readCurrentSeasonAnimes(Integer page) {
@@ -98,13 +109,16 @@ public class AnimeService {
     }
 
     @Transactional
-    public Object readRelatedStreams(Integer malId) {
+    public GetStreamSchema readRelatedStreams(Integer malId) {
         var animeEntity = animeRepository.findByMalId(malId);
 
         if(animeEntity == null) animeEntity = jikanService.readOne(malId);
         if(animeEntity == null) throw new NotFoundException("Anime not found");
         if(animeEntity.getHasConsumetsCache())
-            return animeEntity.getConsumets().stream().map(ConsumetDto::fromEntity).toList();
+            return GetStreamSchema.builder()
+                    .anime(AnimeDto.fromEntity(animeEntity))
+                    .streams(animeEntity.getConsumets().stream().map(ConsumetAnimeDto::fromEntity).toList())
+                    .build();
 
         var consumets = consumetService.readRelatedStreams(animeEntity);
 
@@ -112,16 +126,29 @@ public class AnimeService {
 
         animeRepository.save(animeEntity);
 
-        return consumets.stream().map(ConsumetDto::fromEntity).toList();
+        return GetStreamSchema.builder()
+                .anime(AnimeDto.fromEntity(animeEntity))
+                .streams(consumets.stream().map(ConsumetAnimeDto::fromEntity).toList())
+                .build();
     }
 
     @Transactional
-    public Object readEpisodes(String consumetId) {
-        return consumetService.readEpisodes(consumetId);
+    public GetEpisodeSchema readEpisodes(String consumetId) {
+        var consumetAnimeEntity = consumetAnimeRepository.findByConsumetId(consumetId);
+        return GetEpisodeSchema.builder()
+                .stream(ConsumetAnimeDto.fromEntity(consumetAnimeEntity))
+                .episodes(consumetService.readEpisodes(consumetId)
+                        .stream().map(ConsumetEpisodeDto::fromEntity).toList())
+                .build();
     }
 
     @Transactional
-    public Object readServer(String consumetId, ServerEnum server) {
-        return consumetService.readServer(consumetId, server);
+    public GetServerSchema readServer(String consumetId, ServerEnum server) {
+        var consumetEpisodeEntity = consumetEpisodeRepository.findByConsumetId(consumetId);
+        return GetServerSchema.builder()
+                .episode(ConsumetEpisodeDto.fromEntity(consumetEpisodeEntity))
+                .servers(consumetService.readServers(consumetId, server)
+                        .stream().map(ConsumetServerDto::fromEntity).toList())
+                .build();
     }
 }
