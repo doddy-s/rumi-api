@@ -1,7 +1,6 @@
 package com.doddysujatmiko.rumiapi.auth;
 
 import com.doddysujatmiko.rumiapi.common.BaseEntity;
-import com.doddysujatmiko.rumiapi.consumet.ConsumetServerEntity;
 import com.doddysujatmiko.rumiapi.history.HistoryEntity;
 import jakarta.persistence.*;
 import lombok.*;

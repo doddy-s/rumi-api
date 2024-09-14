@@ -7,7 +7,6 @@ import com.doddysujatmiko.rumiapi.history.HistoryEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.ArrayList;
 import java.util.Date;

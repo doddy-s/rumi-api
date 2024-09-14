@@ -27,7 +27,7 @@ public class HistoryService {
     private final ConsumetEpisodeRepository consumetEpisodeRepository;
 
     @Autowired
-    public HistoryService(UserRepository userRepository, HistoryRepository historyRepository, ValidationService validationService, ConsumetAnimeRepository consumetAnimeRepository, ConsumetEpisodeRepository consumetEpisodeRepository) {
+    public HistoryService(UserRepository userRepository, HistoryRepository historyRepository, ValidationService validationService, ConsumetEpisodeRepository consumetEpisodeRepository) {
         this.userRepository = userRepository;
         this.historyRepository = historyRepository;
         this.validationService = validationService;

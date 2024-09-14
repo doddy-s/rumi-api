@@ -1,7 +1,6 @@
 package com.doddysujatmiko.rumiapi.jikan;
 
 import com.doddysujatmiko.rumiapi.anime.*;
-import com.doddysujatmiko.rumiapi.anime.dtos.AnimeDto;
 import com.doddysujatmiko.rumiapi.anime.enums.SeasonEnum;
 import com.doddysujatmiko.rumiapi.common.SimplePage;
 import com.doddysujatmiko.rumiapi.log.LogService;

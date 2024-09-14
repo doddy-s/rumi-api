@@ -3,7 +3,6 @@ package com.doddysujatmiko.rumiapi.jikan;
 import com.doddysujatmiko.rumiapi.anime.AnimeEntity;
 import com.doddysujatmiko.rumiapi.anime.AnimeRepository;
 import com.doddysujatmiko.rumiapi.anime.GenreEntity;
-import com.doddysujatmiko.rumiapi.anime.dtos.AnimeDto;
 import com.doddysujatmiko.rumiapi.common.SimplePage;
 import com.doddysujatmiko.rumiapi.exceptions.InternalServerErrorException;
 import org.json.JSONArray;
