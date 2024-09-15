@@ -44,7 +44,7 @@ public class HistoryController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<?> postHistory(Principal principal, PostHistoryReqDto req) {
+    public ResponseEntity<?> postHistory(Principal principal, @RequestBody PostHistoryReqDto req) {
         return responser.response(HttpStatus.OK, "Success", historyService.createHistory(principal, req));
     }
 }
